@@ -24,7 +24,11 @@
 
 #include <dpl/log/log.h>
 #include <dpl/singleton_impl.h>
+#ifdef BUILD_WITH_SYSTEMD
 #include <dpl/log/sd_journal_provider.h>
+#else
+#include <dpl/log/syslog_provider.h>
+#endif //BUILD_WITH_SYSTEMD
 #include <dpl/log/old_style_log_provider.h>
 
 IMPLEMENT_SINGLETON(SecurityManager::Log::LogSystem)
@@ -118,11 +122,22 @@ LogSystem::LogSystem() :
                                             oldStyleErrorLogs,
                                             oldStylePedanticLogs));
     } else {
+#ifdef BUILD_WITH_SYSTEMD
         // Systemd Journal
         AddProvider(new SdJournalProvider());
+#else
+        // Syslog Journal
+        AddProvider(new SyslogProvider());
+#endif //BUILD_WITH_SYSTEMD
     }
 #else // BUILD_TYPE_DEBUG
+#ifdef BUILD_WITH_SYSTEMD
+    // Systemd Journal
     AddProvider(new SdJournalProvider());
+#else
+    // Syslog Journal
+    AddProvider(new SyslogProvider());
+#endif //BUILD_WITH_SYSTEMD
 #endif // BUILD_TYPE_DEBUG
 }
 

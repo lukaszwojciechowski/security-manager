@@ -48,7 +48,6 @@ INCLUDE_DIRECTORIES(
 
 SET(COMMON_SOURCES
     ${DPL_PATH}/log/src/abstract_log_provider.cpp
-    ${DPL_PATH}/log/src/sd_journal_provider.cpp
     ${DPL_PATH}/log/src/log.cpp
     ${DPL_PATH}/log/src/old_style_log_provider.cpp
     ${DPL_PATH}/core/src/assert.cpp
@@ -76,6 +75,16 @@ SET(COMMON_SOURCES
     ${COMMON_PATH}/service_impl.cpp
     ${COMMON_PATH}/zone-utils.cpp
     )
+
+IF(BUILD_WITH_SYSTEMD)
+SET(COMMON_SOURCES ${COMMON_SOURCES}
+    ${DPL_PATH}/log/src/sd_journal_provider.cpp
+    )
+ELSE(BUILD_WITH_SYSTEMD)
+SET(COMMON_SOURCES ${COMMON_SOURCES}
+    ${DPL_PATH}/log/src/syslog_provider.cpp
+    )
+ENDIF(BUILD_WITH_SYSTEMD)
 
 ADD_LIBRARY(${TARGET_COMMON} SHARED ${COMMON_SOURCES})
 
