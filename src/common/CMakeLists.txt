@@ -62,8 +62,6 @@ SET(COMMON_SOURCES
     ${COMMON_PATH}/master-req.cpp
     ${COMMON_PATH}/privilege_db.cpp
     ${COMMON_PATH}/smack-labels.cpp
-    ${COMMON_PATH}/smack-rules.cpp
-    ${COMMON_PATH}/smack-check.cpp
     ${COMMON_PATH}/service_impl.cpp
     ${COMMON_PATH}/zone-utils.cpp
     )
@@ -77,6 +75,13 @@ SET(COMMON_SOURCES ${COMMON_SOURCES}
     ${DPL_PATH}/log/src/syslog_provider.cpp
     )
 ENDIF(BUILD_WITH_SYSTEMD)
+
+IF(BUILD_WITH_SMACK)
+SET(COMMON_SOURCES ${COMMON_SOURCES}
+    ${COMMON_PATH}/smack-rules.cpp
+    ${COMMON_PATH}/smack-check.cpp
+    )
+ENDIF(BUILD_WITH_SMACK)
 
 ADD_LIBRARY(${TARGET_COMMON} SHARED ${COMMON_SOURCES})
 

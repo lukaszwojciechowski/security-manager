@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2000 - 2014 Samsung Electronics Co., Ltd All Rights Reserved
+ *  Copyright (c) 2000 - 2015 Samsung Electronics Co., Ltd All Rights Reserved
  *
  *  Contact: Rafal Krypa <r.krypa@samsung.com>
  *
@@ -322,10 +322,11 @@ void MasterService::processSmackInstallRules(MessageBuffer &buffer, MessageBuffe
     Deserialization::Deserialize(buffer, pkgContents);
 
     try {
+#ifdef BUILD_WITH_SMACK
         LogDebug("Adding Smack rules for new appId: " << appId << " with pkgId: "
                 << pkgId << ". Applications in package: " << pkgContents.size());
         SmackRules::installApplicationRules(appId, pkgId, pkgContents, zoneId);
-
+#endif // BUILD_WITH_SMACK
         // FIXME implement zoneSmackLabelMap and check if works when Smack Namespaces are implemented
         std::string zoneAppLabel = SmackLabels::generateAppLabel(appId);
         std::string zonePkgLabel = SmackLabels::generatePkgLabel(pkgId);
@@ -370,6 +371,7 @@ void MasterService::processSmackUninstallRules(MessageBuffer &buffer, MessageBuf
     Deserialization::Deserialize(buffer, removePkg);
 
     try {
+#ifdef BUILD_WITH_SMACK
         if (removePkg) {
             LogDebug("Removing Smack rules for deleted pkgId " << pkgId);
             SmackRules::uninstallPackageRules(pkgId);
@@ -377,7 +379,7 @@ void MasterService::processSmackUninstallRules(MessageBuffer &buffer, MessageBuf
 
         LogDebug ("Removing smack rules for deleted appId " << appId);
         SmackRules::uninstallApplicationRules(appId, pkgId, pkgContents, zoneId);
-
+#endif // BUILD_WITH_SMACK
         // FIXME implement zoneSmackLabelUnmap and check if works when Smack Namespaces are implemented
         std::string zoneAppLabel = SmackLabels::generateAppLabel(appId);
         std::string zonePkgLabel = SmackLabels::generatePkgLabel(pkgId);

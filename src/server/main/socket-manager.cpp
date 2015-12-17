@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2000 - 2014 Samsung Electronics Co., Ltd All Rights Reserved
+ *  Copyright (c) 2000 - 2015 Samsung Electronics Co., Ltd All Rights Reserved
  *
  *  Contact: Rafal Krypa <r.krypa@samsung.com>
  *
@@ -29,7 +29,9 @@
 #include <sys/signalfd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#ifdef BUILD_WTH_SMACK
 #include <sys/smack.h>
+#endif // BUILD_WITH_SMACK
 #include <sys/un.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -497,6 +499,7 @@ int SocketManager::CreateDomainSocketHelp(
         ThrowMsg(Exception::InitFailed, "Error in socket: " << strerror(err));
     }
 
+#ifdef BUILD_WITH_TIZEN
     if (smack_check()) {
         LogInfo("Set up smack label: " << desc.smackLabel);
 
@@ -504,9 +507,10 @@ int SocketManager::CreateDomainSocketHelp(
             LogError("Error in smack_fsetlabel");
             ThrowMsg(Exception::InitFailed, "Error in smack_fsetlabel");
         }
-    } else {
-        LogInfo("No smack on platform. Socket won't be securied with smack label!");
-    }
+    } else
+#endif // BUILD_WITH_TIZEN
+    LogInfo("No smack on platform. Socket won't be securied with smack label!");
+
 
     int flags;
     if (-1 == (flags = fcntl(sockfd, F_GETFL, 0)))

@@ -41,7 +41,9 @@
 #include "protocols.h"
 #include "privilege_db.h"
 #include "cynara.h"
+#ifdef BUILD_WITH_SMACK
 #include "smack-rules.h"
+#endif // BUILD_WITH_SMACK
 #include "smack-labels.h"
 #include "security-manager.h"
 #include "zone-utils.h"
@@ -377,9 +379,11 @@ int ServiceImpl::appInstall(const app_inst_req &req, uid_t uid, bool isSlave)
                 return ret;
             }
         } else {
+#ifdef BUILD_WITH_SMACK
             LogDebug("Adding Smack rules for new appId: " << req.appId << " with pkgId: "
                     << req.pkgId << ". Applications in package: " << pkgContents.size());
             SmackRules::installApplicationRules(req.appId, req.pkgId, pkgContents);
+#endif // BUILD_WITH_SMACK
         }
     } catch (const SmackException::Base &e) {
         LogError("Error while applying Smack policy for application: " << e.DumpToString());
@@ -478,6 +482,7 @@ int ServiceImpl::appUninstall(const std::string &appId, uid_t uid, bool isSlave)
                     return ret;
                 }
             } else {
+#ifdef BUILD_WITH_SMACK
                 if (removePkg) {
                     LogDebug("Removing Smack rules for deleted pkgId " << pkgId);
                     SmackRules::uninstallPackageRules(pkgId);
@@ -485,6 +490,7 @@ int ServiceImpl::appUninstall(const std::string &appId, uid_t uid, bool isSlave)
 
                 LogDebug ("Removing smack rules for deleted appId " << appId);
                 SmackRules::uninstallApplicationRules(appId, pkgId, pkgContents, zoneId);
+#endif //BUILD_WITH_SMACK
             }
         } catch (const SmackException::Base &e) {
             LogError("Error while removing Smack rules for application: " << e.DumpToString());

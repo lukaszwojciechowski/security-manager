@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2000 - 2014 Samsung Electronics Co., Ltd All Rights Reserved
+ *  Copyright (c) 2000 - 2015 Samsung Electronics Co., Ltd All Rights Reserved
  *
  *  Contact: Rafal Krypa <r.krypa@samsung.com>
  *
@@ -24,7 +24,9 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#ifdef BUILD_WITH_SMACK
 #include <sys/smack.h>
+#endif // BUILD_WITH_SMACK
 
 #include <cstring>
 #include <unordered_set>
@@ -45,14 +47,18 @@ bool BaseService::getPeerID(int sock, uid_t &uid, pid_t &pid, std::string &smack
     socklen_t len = sizeof(cr);
 
     if (!getsockopt(sock, SOL_SOCKET, SO_PEERCRED, &cr, &len)) {
+#ifdef BUILD_WITH_SMACK
         char *smk;
         ssize_t ret = smack_new_label_from_socket(sock, &smk);
         if (ret < 0)
             return false;
         smackLabel = smk;
+        free(smk);
+#else // BUILD_WITH_SMACK
+        smackLabel = "";
+#endif // BUILD_WITH_SMACK
         uid = cr.uid;
         pid = cr.pid;
-        free(smk);
         return true;
     }
 

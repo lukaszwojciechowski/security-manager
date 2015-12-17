@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2014 Samsung Electronics Co., Ltd All Rights Reserved
+ *  Copyright (c) 2014-2015 Samsung Electronics Co., Ltd All Rights Reserved
  *
  *  Contact: Rafal Krypa <r.krypa@samsung.com>
  *
@@ -25,7 +25,9 @@
  */
 
 #include <sys/stat.h>
+#ifdef BUILD_WITH_SMACK
 #include <sys/smack.h>
+#endif //BUILD_WITH_SMACK
 #include <sys/xattr.h>
 #include <linux/xattr.h>
 #include <memory>
@@ -175,8 +177,10 @@ std::string generateAppLabel(const std::string &appId)
 {
     std::string label = "User::App::" + appId;
 
+#ifdef BUILD_WITH_SMACK
     if (smack_label_length(label.c_str()) <= 0)
         ThrowMsg(SmackException::InvalidLabel, "Invalid Smack label generated from appId " << appId);
+#endif //BUILD_WITH_SMACK
 
     return label;
 }
@@ -185,8 +189,10 @@ std::string generatePkgLabel(const std::string &pkgId)
 {
     std::string label = "User::Pkg::" + pkgId;
 
+#ifdef BUILD_WITH_SMACK
     if (smack_label_length(label.c_str()) <= 0)
         ThrowMsg(SmackException::InvalidLabel, "Invalid Smack label generated from pkgId " << pkgId);
+#endif //BUILD_WITH_SMACK
 
     return label;
 }
@@ -195,8 +201,10 @@ std::string generatePkgROLabel(const std::string &pkgId)
 {
     std::string label = "User::Pkg::" + pkgId + "::RO";
 
+#ifdef BUILD_WITH_SMACK
     if (smack_label_length(label.c_str()) <= 0)
         ThrowMsg(SmackException::InvalidLabel, "Invalid Smack label generated from pkgId " << pkgId);
+#endif //BUILD_WITH_SMACK
 
     return label;
 }

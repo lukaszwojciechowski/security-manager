@@ -36,7 +36,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/xattr.h>
+#ifdef BUILD_WITH_SMACK
 #include <sys/smack.h>
+#endif //BUILD_WITH_SMACK
 #include <sys/capability.h>
 
 #include <dpl/log/log.h>
@@ -347,8 +349,10 @@ static bool setup_smack(const char *label)
         }
     } while (true);
 
+#ifdef BUILD_WITH_SMACK
     // Set Smack label of current process
     smack_set_label_for_self(label);
+#endif // BUILD_WITH_SMACK
 
     return SECURITY_MANAGER_SUCCESS;
 }
@@ -361,8 +365,10 @@ int security_manager_set_process_label_from_appid(const char *app_id)
 
     LogDebug("security_manager_set_process_label_from_appid() called");
 
+#ifdef BUILD_WITH_SMACK
     if (smack_smackfs_path() == NULL)
         return SECURITY_MANAGER_SUCCESS;
+#endif // BUILD_WITH_SMACK
 
     // FIXME Below modifications related to zones are temporary. Remove when Smack Namespaces
     //       are implemented.
