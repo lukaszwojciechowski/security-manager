@@ -25,6 +25,7 @@ PROJECT("security-manager")
 ############################# cmake packages ##################################
 
 INCLUDE(FindPkgConfig)
+INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(GNUInstallDirs)
 
 ########################## search for packages ################################
@@ -84,13 +85,26 @@ ADD_DEFINITIONS("-DDB_INSTALL_DIR=\"${DB_INSTALL_DIR}\"")
 ############################# compiler flags ##################################
 
 SET(CMAKE_C_FLAGS_PROFILING    "-g -O0 -pg -Wp,-U_FORTIFY_SOURCE")
-SET(CMAKE_CXX_FLAGS_PROFILING  "-g -std=c++0x -O0 -pg -Wp,-U_FORTIFY_SOURCE")
+SET(CMAKE_CXX_FLAGS_PROFILING  "-g -O0 -pg -Wp,-U_FORTIFY_SOURCE")
 SET(CMAKE_C_FLAGS_DEBUG        "-g -O0 -ggdb -Wp,-U_FORTIFY_SOURCE")
-SET(CMAKE_CXX_FLAGS_DEBUG      "-g -std=c++0x -O0 -ggdb -Wp,-U_FORTIFY_SOURCE")
+SET(CMAKE_CXX_FLAGS_DEBUG      "-g -O0 -ggdb -Wp,-U_FORTIFY_SOURCE")
 SET(CMAKE_C_FLAGS_RELEASE      "-g -O2")
-SET(CMAKE_CXX_FLAGS_RELEASE    "-g -std=c++0x -O2")
+SET(CMAKE_CXX_FLAGS_RELEASE    "-g -O2")
 SET(CMAKE_C_FLAGS_CCOV         "-g -O2 --coverage")
-SET(CMAKE_CXX_FLAGS_CCOV       "-g -std=c++0x -O2 --coverage")
+SET(CMAKE_CXX_FLAGS_CCOV       "-g -O2 --coverage")
+
+# Check for C++11 support and enable proper compilation flags
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+IF(COMPILER_SUPPORTS_CXX11)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+ELSE()
+    CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+    IF(COMPILER_SUPPORTS_CXX0X)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    ELSE()
+        MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+    ENDIF()
+ENDIF()
 
 # If supported for the target machine, emit position-independent code,suitable
 # for dynamic linking and avoiding any limit on the size of the global offset
