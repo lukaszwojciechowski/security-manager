@@ -58,7 +58,6 @@ PrivilegeDb::PrivilegeDb(const std::string &path)
 {
     try {
         mSqlConnection = new DB::SqlConnection(path,
-                DB::SqlConnection::Flag::None,
                 DB::SqlConnection::Flag::RW);
         initDataCommands();
     } catch (DB::SqlConnection::Exception::Base &e) {

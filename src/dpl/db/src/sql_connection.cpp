@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Samsung Electronics Co., Ltd All Rights Reserved
+ * Copyright (c) 2011-2015 Samsung Electronics Co., Ltd All Rights Reserved
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@
 #include <memory>
 #include <dpl/noncopyable.h>
 #include <dpl/assert.h>
-#include <db-util.h>
 #include <unistd.h>
 #include <cstdio>
 #include <cstdarg>
@@ -607,7 +606,6 @@ boost::optional<String> SqlConnection::DataCommand::GetColumnOptionalString(
 }
 
 void SqlConnection::Connect(const std::string &address,
-                            Flag::Type type,
                             Flag::Option flag)
 {
     if (m_connection != NULL) {
@@ -618,25 +616,11 @@ void SqlConnection::Connect(const std::string &address,
 
     // Connect to database
     int result;
-    if (type & Flag::UseLucene) {
-        result = db_util_open_with_options(
-                address.c_str(),
-                &m_connection,
-                flag,
-                NULL);
-
-        m_usingLucene = true;
-        LogPedantic("Lucene index enabled");
-    } else {
-        result = sqlite3_open_v2(
-                address.c_str(),
-                &m_connection,
-                flag,
-                NULL);
-
-        m_usingLucene = false;
-        LogPedantic("Lucene index disabled");
-    }
+    result = sqlite3_open_v2(
+             address.c_str(),
+             &m_connection,
+             flag,
+             NULL);
 
     if (result == SQLITE_OK) {
         LogPedantic("Connected to DB");
@@ -664,12 +648,7 @@ void SqlConnection::Disconnect()
            " before disconnecting SqlConnection");
 
     int result;
-
-    if (m_usingLucene) {
-        result = db_util_close(m_connection);
-    } else {
-        result = sqlite3_close(m_connection);
-    }
+    result = sqlite3_close(m_connection);
 
     if (result != SQLITE_OK) {
         const char *error = sqlite3_errmsg(m_connection);
@@ -704,18 +683,16 @@ bool SqlConnection::CheckTableExist(const char *tableName)
 }
 
 SqlConnection::SqlConnection(const std::string &address,
-                             Flag::Type flag,
                              Flag::Option option,
                              SynchronizationObject *synchronizationObject) :
     m_connection(NULL),
-    m_usingLucene(false),
     m_dataCommandsCount(0),
     m_synchronizationObject(synchronizationObject)
 {
     LogPedantic("Opening database connection to: " << address);
 
     // Connect to DB
-    SqlConnection::Connect(address, flag, option);
+    SqlConnection::Connect(address, option);
 
     if (!m_synchronizationObject) {
         LogPedantic("No synchronization object defined");

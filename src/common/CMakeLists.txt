@@ -3,15 +3,6 @@ SET(COMMON_VERSION ${COMMON_VERSION_MAJOR}.0.2)
 
 ########################## search for packages ################################
 
-PKG_CHECK_MODULES(DBUTIL_DEP
-    QUIET
-    db-util
-    )
-
-IF (DBUTIL_DEP_FOUND)
-    SET(BUILD_WITH_DBUTIL ON)
-ENDIF (DBUTIL_DEP_FOUND)
-
 PKG_CHECK_MODULES(TIZEN_DEP
     QUIET
     libtzplatform-config

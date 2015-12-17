@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Samsung Electronics Co., Ltd All Rights Reserved
+ * Copyright (c) 2011-2015 Samsung Electronics Co., Ltd All Rights Reserved
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -378,12 +378,6 @@ class SqlConnection
     class Flag
     {
       public:
-        enum Type
-        {
-            None = 1 << 0,
-            UseLucene = 1 << 1
-        };
-
         enum Option
         {
             RO = SQLITE_OPEN_NOMUTEX | SQLITE_OPEN_READONLY,
@@ -423,9 +417,6 @@ class SqlConnection
   protected:
     sqlite3 *m_connection;
 
-    // Options
-    bool m_usingLucene;
-
     // Stored data procedures
     int m_dataCommandsCount;
 
@@ -433,7 +424,7 @@ class SqlConnection
     std::unique_ptr<SynchronizationObject> m_synchronizationObject;
 
     virtual void Connect(const std::string &address,
-                         Flag::Type = Flag::None, Flag::Option = Flag::RO);
+                         Flag::Option = Flag::RO);
     virtual void Disconnect();
 
     void TurnOnForeignKeys();
@@ -462,7 +453,6 @@ class SqlConnection
      * @param synchronizationObject A synchronization object to use.
      */
     explicit SqlConnection(const std::string &address = std::string(),
-                           Flag::Type flags = Flag::None,
                            Flag::Option options = Flag::RO,
                            SynchronizationObject *synchronizationObject =
                                AllocDefaultSynchronizationObject());
