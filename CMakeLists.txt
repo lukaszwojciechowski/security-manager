@@ -25,6 +25,7 @@ PROJECT("security-manager")
 ############################# cmake packages ##################################
 
 INCLUDE(FindPkgConfig)
+INCLUDE(GNUInstallDirs)
 
 ########################## search for packages ################################
 
@@ -46,6 +47,39 @@ PKG_CHECK_MODULES(SMACK_DEP
 IF (SMACK_DEP_FOUND)
     SET(BUILD_WITH_SMACK ON)
 ENDIF (SMACK_DEP_FOUND)
+
+########################  directory configuration  ############################
+
+SET(LIB_INSTALL_DIR
+    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}"
+    CACHE PATH
+    "Object code libraries directory")
+
+SET(BIN_INSTALL_DIR
+    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}"
+    CACHE PATH
+    "User executables directory")
+
+SET(INCLUDE_INSTALL_DIR
+    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}"
+    CACHE PATH
+    "Header files directory")
+
+SET(SYSTEMD_INSTALL_DIR
+    "${CMAKE_INSTALL_PREFIX}/lib/systemd/system"
+    CACHE PATH
+    "Systemd system unit file directory")
+
+SET(DB_INSTALL_DIR
+    "${CMAKE_INSTALL_PREFIX}/var/security-manager/db"
+    CACHE PATH
+    "Database directory")
+
+ADD_DEFINITIONS("-DLIB_INSTALL_DIR=\"${LIB_INSTALL_DIR}\"")
+ADD_DEFINITIONS("-DBIN_INSTALL_DIR=\"${BIN_INSTALL_DIR}\"")
+ADD_DEFINITIONS("-DINCLUDE_INSTALL_DIR=\"${INCLUDE_INSTALL_DIR}\"")
+ADD_DEFINITIONS("-DSYSTEMD_INSTALL_DIR=\"${SYSTEMD_INSTALL_DIR}\"")
+ADD_DEFINITIONS("-DDB_INSTALL_DIR=\"${DB_INSTALL_DIR}\"")
 
 ############################# compiler flags ##################################
 
