@@ -1,4 +1,4 @@
-# Copyright (c) 2011 - 2014 Samsung Electronics Co., Ltd All Rights Reserved
+# Copyright (c) 2011 - 2015 Samsung Electronics Co., Ltd All Rights Reserved
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -25,6 +25,27 @@ PROJECT("security-manager")
 ############################# cmake packages ##################################
 
 INCLUDE(FindPkgConfig)
+
+########################## search for packages ################################
+
+PKG_CHECK_MODULES(SYSTEMD_DEP
+    QUIET
+    libsystemd-daemon
+    libsystemd-journal
+    )
+
+IF (SYSTEMD_DEP_FOUND)
+    SET(BUILD_WITH_SYSTEMD ON)
+ENDIF (SYSTEMD_DEP_FOUND)
+
+PKG_CHECK_MODULES(SMACK_DEP
+    QUIET
+    libsmack
+    )
+
+IF (SMACK_DEP_FOUND)
+    SET(BUILD_WITH_SMACK ON)
+ENDIF (SMACK_DEP_FOUND)
 
 ############################# compiler flags ##################################
 
@@ -58,8 +79,14 @@ IF (CMAKE_BUILD_TYPE MATCHES "DEBUG")
     ADD_DEFINITIONS("-DBUILD_TYPE_DEBUG")
 ENDIF (CMAKE_BUILD_TYPE MATCHES "DEBUG")
 
+IF (BUILD_WITH_SYSTEMD)
+    ADD_DEFINITIONS("-DBUILD_WITH_SYSTEMD")
+ENDIF (BUILD_WITH_SYSTEMD)
+
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(pc)
-ADD_SUBDIRECTORY(systemd)
+IF (BUILD_WITH_SYSTEMD)
+    ADD_SUBDIRECTORY(systemd)
+ENDIF (BUILD_WITH_SYSTEMD)
 ADD_SUBDIRECTORY(db)
 ADD_SUBDIRECTORY(policy)

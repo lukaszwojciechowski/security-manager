@@ -1,19 +1,39 @@
 SET(COMMON_VERSION_MAJOR 1)
 SET(COMMON_VERSION ${COMMON_VERSION_MAJOR}.0.2)
 
+########################## search for packages ################################
+
+PKG_CHECK_MODULES(DBUTIL_DEP
+    QUIET
+    db-util
+    )
+
+IF (DBUTIL_DEP_FOUND)
+    SET(BUILD_WITH_DBUTIL ON)
+ENDIF (DBUTIL_DEP_FOUND)
+
+PKG_CHECK_MODULES(TIZEN_DEP
+    QUIET
+    libtzplatform-config
+    )
+
+IF (TIZEN_DEP_FOUND)
+    SET(BUILD_WITH_TIZEN ON)
+ENDIF (TIZEN_DEP_FOUND)
+
 PKG_CHECK_MODULES(COMMON_DEP
     REQUIRED
-    libsystemd-journal
-    libsmack
-    db-util
     cynara-admin
     cynara-client-async
-    libtzplatform-config
     )
 
 FIND_PACKAGE(Boost REQUIRED)
 
 INCLUDE_DIRECTORIES(SYSTEM
+    ${SYSTEMD_DEP_INCLUDE_DIRS}
+    ${SMACK_DEP_INCLUDE_DIRS}
+    ${DBUTIL_DEP_INCLUDE_DIRS}
+    ${TIZEN_DEP_INCLUDE_DIRS}
     ${COMMON_DEP_INCLUDE_DIRS}
     )
 
@@ -67,6 +87,10 @@ SET_TARGET_PROPERTIES(${TARGET_COMMON}
     )
 
 TARGET_LINK_LIBRARIES(${TARGET_COMMON}
+    ${SYSTEMD_DEP_LIBRARIES}
+    ${SMACK_DEP_LIBRARIES}
+    ${DBUTIL_DEP_LIBRARIES}
+    ${TIZEN_DEP_LIBRARIES}
     ${COMMON_DEP_LIBRARIES}
     )
 
