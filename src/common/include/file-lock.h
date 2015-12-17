@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2000 - 2014 Samsung Electronics Co., Ltd All Rights Reserved
+ *  Copyright (c) 2000 - 2015 Samsung Electronics Co., Ltd All Rights Reserved
  *
  *  Contact: Rafal Krypa <r.krypa@samsung.com>
  *
@@ -29,7 +29,6 @@
 
 #include <dpl/exception.h>
 #include <dpl/noncopyable.h>
-#include <tzplatform_config.h>
 
 namespace SecurityManager {
 

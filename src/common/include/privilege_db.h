@@ -36,14 +36,20 @@
 #include <string>
 
 #include <dpl/db/sql_connection.h>
+#ifdef BUILD_WITH_TIZEN
 #include <tzplatform_config.h>
+#endif //BUILD_WITH_TIZEN
 
 #ifndef PRIVILEGE_DB_H_
 #define PRIVILEGE_DB_H_
 
 namespace SecurityManager {
 
+#ifdef BUILD_WITH_TIZEN
 const char *const PRIVILEGE_DB_PATH = tzplatform_mkpath(TZ_SYS_DB, ".security-manager.db");
+#else
+const char *const PRIVILEGE_DB_PATH = DB_INSTALL_DIR "/.security-manager.db";
+#endif //BUILD_WITH_TIZEN
 
 enum class StmtType {
     EGetPkgPrivileges,

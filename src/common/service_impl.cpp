@@ -33,7 +33,9 @@
 #include <algorithm>
 
 #include <dpl/log/log.h>
+#ifdef BUILD_WITH_TIZEN
 #include <tzplatform_config.h>
+#endif
 
 #include <config.h>
 #include "protocols.h"
@@ -142,8 +144,12 @@ ServiceImpl::~ServiceImpl()
 
 uid_t ServiceImpl::getGlobalUserId(void)
 {
+#ifdef BUILD_WITH_TIZEN
     static uid_t globaluid = tzplatform_getuid(TZ_SYS_GLOBALAPP_USER);
     return globaluid;
+#else // BUILD_WITH_TIZEN
+    return 0;
+#endif //BUILD_WITH_TIZEN
 }
 
 /**
@@ -173,6 +179,7 @@ bool ServiceImpl::isSubDir(const char *parent, const char *subdir)
 
 bool ServiceImpl::getUserAppDir(const uid_t &uid, std::string &userAppDir)
 {
+#ifdef BUILD_WITH_TIZEN
     struct tzplatform_context *tz_ctx = nullptr;
 
     if (tzplatform_context_create(&tz_ctx))
@@ -197,7 +204,10 @@ bool ServiceImpl::getUserAppDir(const uid_t &uid, std::string &userAppDir)
 
     tzplatform_context_destroy(tz_ctx);
     tz_ctx = nullptr;
-
+#else //BUILD_WITH_TIZEN
+    (void) uid;
+    userAppDir = "/root";
+#endif //BUILD_WITH_TIZEN
     return true;
 }
 

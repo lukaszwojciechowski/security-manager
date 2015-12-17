@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2000 - 2014 Samsung Electronics Co., Ltd All Rights Reserved
+ *  Copyright (c) 2000 - 2015 Samsung Electronics Co., Ltd All Rights Reserved
  *
  *  Contact: Rafal Krypa <r.krypa@samsung.com>
  *
@@ -28,11 +28,19 @@
 
 #include "file-lock.h"
 
+#ifdef BUILD_WITH_TIZEN
+#include <tzplatform_config.h>
+#endif
+
 namespace SecurityManager {
 
+#ifdef BUILD_WITH_TIZEN
 char const * const SERVICE_LOCK_FILE = tzplatform_mkpath3(TZ_SYS_RUN,
                                                          "lock",
                                                          "security-manager.lock");
+#else
+char const * const SERVICE_LOCK_FILE = "/var/lock/security-manager.lock";
+#endif //BUILD_WITH_TIZEN
 
 FileLocker::FileLocker(const std::string &lockFile, bool blocking)
 {
