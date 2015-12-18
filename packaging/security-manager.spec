@@ -20,6 +20,7 @@ BuildRequires: pkgconfig(libtzplatform-config)
 BuildRequires: pkgconfig(sqlite3)
 BuildRequires: pkgconfig(cynara-admin)
 BuildRequires: pkgconfig(cynara-client-async)
+BuildRequires: pkgconfig(icu-i18n)
 BuildRequires: boost-devel
 %{?systemd_requires}
 
