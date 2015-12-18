@@ -40,7 +40,9 @@
 #include <errno.h>
 #include <time.h>
 
+#ifdef BUILD_WITH_SYSTEMD
 #include <systemd/sd-daemon.h>
+#endif // BUILD_WITH_SYSTEMD
 
 #include <dpl/log/log.h>
 #include <dpl/assert.h>
@@ -337,11 +339,13 @@ void SocketManager::ReadyForWrite(int sock) {
 }
 
 void SocketManager::MainLoop() {
+#ifdef BUILD_WITH_SYSTEMD
     // remove evironment values passed by systemd
     sd_listen_fds(1);
 
     // Daemon is ready to work.
     sd_notify(0, "READY=1");
+#endif //BUILD_WITH_SYSTEMD
 
     m_working = true;
     while(m_working) {
@@ -452,6 +456,7 @@ void SocketManager::MainLoopStop()
     NotifyMe();
 }
 
+#ifdef BUILD_WITH_SYSTEMD
 int SocketManager::GetSocketFromSystemD(
     const GenericSocketService::ServiceDescription &desc)
 {
@@ -480,6 +485,7 @@ int SocketManager::GetSocketFromSystemD(
     LogInfo("No useable sockets were passed by systemd.");
     return -1;
 }
+#endif //BUILD_WITH_SYSTEMD
 
 int SocketManager::CreateDomainSocketHelp(
     const GenericSocketService::ServiceDescription &desc)
@@ -555,15 +561,19 @@ void SocketManager::CreateDomainSocket(
     GenericSocketService *service,
     const GenericSocketService::ServiceDescription &desc)
 {
-    int sockfd = GetSocketFromSystemD(desc);
+    int sockfd = -1;
+#ifdef BUILD_WITH_SYSTEMD
+    sockfd = GetSocketFromSystemD(desc);
     if (-1 == sockfd) {
         if (desc.systemdOnly) {
             LogError("Socket " << desc.serviceHandlerPath << " not provided by systemd.");
             ThrowMsg(Exception::InitFailed, "Socket " << desc.serviceHandlerPath <<
                 " must be provided by systemd, but it was not.");
         }
-        sockfd = CreateDomainSocketHelp(desc);
     }
+#endif // BUILD_WITH_SYSTEMD
+    if (sockfd == -1)
+        sockfd = CreateDomainSocketHelp(desc);
 
     auto &description = CreateDefaultReadSocketDescription(sockfd, false);
 
